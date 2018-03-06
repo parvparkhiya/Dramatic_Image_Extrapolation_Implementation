@@ -1,16 +1,25 @@
 function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, refl)
-  %computeM where M is transformation matrix
+  %computeM where M is transformation matrix  
   patchsz=32;
 
   M=computeM(scal,rot,refl); %parv
 
   %applying M to a uniform patch
-  tranformed_patch=compute_transformed_patch(M,patchsz); %parv
+  [tranformed_patch,uniform_patch]=compute_transformed_patch(M,patchsz); %parv
+
+
+  tranformed_patch_i=tranformed_patch(:,:,1);
+  tranformed_patch_j=tranformed_patch(:,:,2);
+  i_min=min(tranformed_patch_i(:))+i_shift;
+  i_max=max(tranformed_patch_i(:))+i_shift;
+  j_min=min(tranformed_patch_j(:))+j_shift;
+  j_max=max(tranformed_patch_j(:))+j_shift;
+
 
   %save feature vectors of all patches in interior of Igi
   for i=1:size(Igi,1)
       for j=1:size(Igi,2)
-        if (condition) %if tranformed_patch + (i,j) is contained in Igi
+        if (i_min+i>=1 && i_max+i<=size(Igi,1) && j_min+j>=1 && j_max+j<=size(Igi,2)) %if tranformed_patch + (i,j) is contained in Igi
           interior_feature(i,j)=compute_featurevector(Igi,tranformed_patch + (i,j));
         else
           interior_feature(i,j)=NA;
@@ -22,8 +31,8 @@ function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, r
   maxTxTy=sqrt((size(Igi,1)^2)+(size(Igi,2)^2));
   width_Ig=size(Ig,1);
   height_Ig=size(Ig,2);
-  thresh=1000;  //change thresh
-  feature_vector=zeros(width_Ig,height_Ig,feature_sz); //change feature_sz
+  thresh=1000;  %change threshold
+  feature_vector=zeros(width_Ig,height_Ig,feature_sz);%change feature_sz
   contributor_histogram=cell(maxTxTy,maxTxTy);
   Histogram=zeros((maxTxTy*maxTxTy),1);
   for i=1:size(Ig,1)
@@ -39,6 +48,7 @@ function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, r
             end
           end
         end
+
       %delta_feature_vector=maxk(delta_feature_vector,K,1); //returns ii jj along with temp_delta
       delta_feature_vector=sort(delta_feature_vector,1,'descend');
       delta_feature_vector=delta_feature_vector(1:K,:);
