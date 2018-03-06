@@ -1,16 +1,25 @@
 function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, refl)
-  %computeM where M is transformation matrix
+  %computeM where M is transformation matrix  
   patchsz=32;
-  
+
   M=computeM(scal,rot,refl); %parv
 
   %applying M to a uniform patch
-  tranformed_patch=compute_transformed_patch(M,patchsz); %parv
+  [tranformed_patch,uniform_patch]=compute_transformed_patch(M,patchsz); %parv
+
+
+  tranformed_patch_i=tranformed_patch(:,:,1);
+  tranformed_patch_j=tranformed_patch(:,:,2);
+  i_min=min(tranformed_patch_i(:))+i_shift;
+  i_max=max(tranformed_patch_i(:))+i_shift;
+  j_min=min(tranformed_patch_j(:))+j_shift;
+  j_max=max(tranformed_patch_j(:))+j_shift;
+
 
   %save feature vectors of all patches in interior of Igi
   for i=1:size(Igi,1)
       for j=1:size(Igi,2)
-        if (condition) %if tranformed_patch + (i,j) is contained in Igi
+        if (i_min+i>=1 && i_max+i<=size(Igi,1) && j_min+j>=1 && j_max+j<=size(Igi,2)) %if tranformed_patch + (i,j) is contained in Igi
           interior_feature(i,j)=compute_featurevector(Igi,tranformed_patch + (i,j));
         else
           interior_feature(i,j)=NA;
@@ -31,7 +40,7 @@ function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, r
             end
           end
         end
-      delta_feature_vector=pickbestK(delta_feature_vector); //returns ii jj along with temp_delta
+      delta_feature_vector=pickbestK(delta_feature_vector); %returns ii jj along with temp_delta
       for kk=1:K
         Tx=Bgi(1,1)+delta_feature_vector(kk,2)-1-i;
         Ty=Bgi(1,2)+delta_feature_vector(kk,3)-1-j;
