@@ -9,5 +9,7 @@ function rgbf = get_rgb_value_by_bi(I, px, py)
 	rgbx2 = I(x(1), y(2), :) * (1 - (px - floor(px))) + I(x(2), y(2), :) * (px - floor(px));
 
 	rgbf = rgbx1 * (1 - (py - floor(py))) + rgbx2 * (py - floor(py));
+
+	rgbf = reshape(rgbf, [1 3]);
 	
 end
