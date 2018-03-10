@@ -5,27 +5,30 @@ function [best_translation,maxTxTy,num_patches,contributor_histogram]=process_br
 
   M=computeM(scal,rot,refl); %parv
 
-  %applying M to a uniform patch
-  [tranformed_patch,uniform_patch]=compute_transformed_patch(M,patchsz); %parv
+  %transform_image
+  Igii=transform_im(Igi,scal,rot,refl);
+
+  % [tranformed_patch,uniform_patch]=compute_transformed_patch(M,patchsz); %parv
 
 
-  tranformed_patch_i=tranformed_patch(:,:,1);
-  tranformed_patch_j=tranformed_patch(:,:,2);
-  i_min=min(tranformed_patch_i(:));
-  i_max=max(tranformed_patch_i(:));
-  j_min=min(tranformed_patch_j(:));
-  j_max=max(tranformed_patch_j(:));
+  % tranformed_patch_i=tranformed_patch(:,:,1);
+  % tranformed_patch_j=tranformed_patch(:,:,2);
+  % i_min=min(tranformed_patch_i(:));
+  % i_max=max(tranformed_patch_i(:));
+  % j_min=min(tranformed_patch_j(:));
+  % j_max=max(tranformed_patch_j(:));
 
-  interior_feature=ones(size(Igi,1),size(Igi,2),(patchsz*patchsz*3)+hogsize)*(-1);
+  interior_feature=ones(size(Igi,1),size(Igi,2),(patchsz*patchsz*3))*(-1);
 
   %save feature vectors of all patches in interior of Igi
-  %NOTE: not considering hog features for now.
-  for i=1:size(Igi,1)
-      for j=1:size(Igi,2)
-        if (i_min+i>=1 && i_max+i<=size(Igi,1) && j_min+j>=1 && j_max+j<=size(Igi,2)) %if tranformed_patch + (i,j) is contained in Igi
-          disp(strcat(num2str(i),' ',num2str(j)));
-          interior_feature(i,j,:)=compute_featurevector(Igi,tranformed_patch,i,j,patchsz);
-        end
+  %NOTE: not considering hog features
+  for i=ceil(patchsz/2):(size(Igii,1)-floor(patchsz/2))
+      for j=ceil(patchsz/2):(size(Igii,2)-floor(patchsz/2))
+        % if (i_min+i>=1 && i_max+i<=size(Igi,1) && j_min+j>=1 && j_max+j<=size(Igi,2)) %if tranformed_patch + (i,j) is contained in Igi
+          % disp(strcat(num2str(i),' ',num2str(j)));
+          % interior_feature(i,j,:)=compute_featurevector(Igi,tranformed_patch,i,j,patchsz);
+          interior_feature(i,j,:)=compute_featurevector(Igii,i,j,patchsz);
+        % end
       end
   end
 
@@ -41,7 +44,7 @@ function [best_translation,maxTxTy,num_patches,contributor_histogram]=process_br
     for j=1:size(Ig,2)
       delta_feature_vector=[];
       if((i<Bgi(1) || (i>Bgi(1)+Bgi(3)) &&( i>Bgi(2,1) || j>Bgi(2,2))))
-        feature_vector(i,j,:)=compute_featurevector(Igi,uniform_patch,i,j,patchsz);
+        feature_vector(i,j,:)=compute_featurevector(Ig,i,j,patchsz);
         for ii=1:size(Igi,1)
           for jj=1:size(Igi,2)
             if (interior_feature(ii,jj,1)~=-1)
