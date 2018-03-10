@@ -39,8 +39,9 @@ function [best_translation,maxTxTy,num_patches,contributor_histogram]=process_br
   feature_vector=zeros(width_Ig,height_Ig,(patchsz*patchsz*3)+hogsize);%change feature_sz
   contributor_histogram=cell(maxTxTy,maxTxTy);
   Histogram=zeros((maxTxTy*maxTxTy),1);
-  for i=1:size(Ig,1)
-    for j=1:size(Ig,2)
+  w=floor(patchsz/2);
+  for i=w:(size(Ig,1)-w)
+    for j=w:(size(Ig,2)-w)
       delta_feature_vector=[];
       if((i<Bgi(1) || (i>Bgi(1)+Bgi(3)) &&( i>Bgi(2,1) || j>Bgi(2,2))))
         feature_vector(i,j,:)=compute_featurevector(Ig,i,j,patchsz);
