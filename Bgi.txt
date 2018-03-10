@@ -1,0 +1,5 @@
+//For gate images
+265,392 Top left
+1341,392 Top right
+266,1106 Bottom left
+1341,1106 Bottom right
