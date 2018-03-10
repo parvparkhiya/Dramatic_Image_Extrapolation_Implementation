@@ -15,14 +15,13 @@ function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, r
   j_min=min(tranformed_patch_j(:))+j_shift;
   j_max=max(tranformed_patch_j(:))+j_shift;
 
+  interior_feature=ones(size(Igi,1),size(Igi,2),(33*33*3)+31)*(-1);
 
   %save feature vectors of all patches in interior of Igi
   for i=1:size(Igi,1)
       for j=1:size(Igi,2)
         if (i_min+i>=1 && i_max+i<=size(Igi,1) && j_min+j>=1 && j_max+j<=size(Igi,2)) %if tranformed_patch + (i,j) is contained in Igi
-          interior_feature(i,j)=compute_featurevector(Igi,tranformed_patch + (i,j));
-        else
-          interior_feature(i,j)=NA;
+          interior_feature(i,j,:)=compute_featurevector(Igi,tranformed_patch,i,j);
         end
       end
   end
@@ -38,13 +37,15 @@ function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, r
   for i=1:size(Ig,1)
     for j=1:size(Ig,2)
       delta_feature_vector=[];
-      if((i<Bgi(1) || (i>Bgi(1)+Bgi(3)) &&( i>Bgi(2,1) || j>Bgi(2,2)))
-        feature_vector(i,j,:)=compute_featurevector(Igi,uniformpatch+(i,j));
+      if((i<Bgi(1) || (i>Bgi(1)+Bgi(3)) &&( i>Bgi(2,1) || j>Bgi(2,2))))
+        feature_vector(i,j,:)=compute_featurevector(Igi,uniformpatch,i,j);
         for ii=1:size(Igi,1)
           for jj=1:size(Igi,2)
-            temp_delta=norm(feature_vector(i,j,:)-interior_feature(ii,jj,:));
-            if temp_delta<thresh
-                  delta_feature_vector=[delta_feature_vector;temp_delta,ii,jj];
+            if (interior_feature(ii,jj,1)~=-1)
+              temp_delta=norm(feature_vector(i,j,:)-interior_feature(ii,jj,:));
+              if (temp_delta<thresh)
+                    delta_feature_vector=[delta_feature_vector;temp_delta,ii,jj];
+              end
             end
           end
         end
