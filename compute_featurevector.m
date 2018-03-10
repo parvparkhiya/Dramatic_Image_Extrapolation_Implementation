@@ -1,4 +1,4 @@
-function feature = compute_featurevector(I, transform_matrix, startx, starty)
+function feature = compute_featurevector(I, transform_matrix, startx, starty, patch_size)
 	% Args - 
 	%	I - image from which feature vector has to be calculated
 	%	transform_matrix - a 2d matrix containing transformed patch
@@ -6,13 +6,12 @@ function feature = compute_featurevector(I, transform_matrix, startx, starty)
 	%	starty - starting y pixel
 	% Returns
 	%	feature - a vector containing rgb values and hog features for the patch
-	patch_size = 32;
-	points = [];
+	% patch_size = 32;
 
 	feature = [];
 	idx = 0;
 
-	Is = zeros(32,32, 3);
+	Is = zeros(patch_size,patch_size, 3);
 
 	% rounding the transfrom_matrix values to integer. TODO: think how to
 	% do bilinear interpolation to get corresponding pixel values instead.
@@ -25,13 +24,12 @@ function feature = compute_featurevector(I, transform_matrix, startx, starty)
 
 			feature = [feature, get_rgb_value_by_bi(I, px, py)];
 			Is(i, j, :) = get_rgb_value_by_bi(I, px, py);
-			points = [points; px, py];
 		end
 	end
-	size(feature)
+	% size(feature)
 
 	fet = extractHOGFeatures(Is);
-	size(fet)
+	% size(Is)
 
 	feature = [feature, fet];
 
