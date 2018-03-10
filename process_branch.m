@@ -21,6 +21,7 @@ function [best_translation,maxTxTy,num_patches,contributor_histogram]=process_br
   interior_feature=ones(size(Igi,1),size(Igi,2),(patchsz*patchsz*3))*(-1);
 
   %save feature vectors of all patches in interior of Igi
+  %NOTE: not considering hog features
   for i=ceil(patchsz/2):(size(Igii,1)-floor(patchsz/2))
       for j=ceil(patchsz/2):(size(Igii,2)-floor(patchsz/2))
         % if (i_min+i>=1 && i_max+i<=size(Igi,1) && j_min+j>=1 && j_max+j<=size(Igi,2)) %if tranformed_patch + (i,j) is contained in Igi
