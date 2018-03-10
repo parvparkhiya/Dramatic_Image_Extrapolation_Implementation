@@ -1,4 +1,4 @@
-function [feature Is] = compute_featurevector(I, idx, idy, patch_size)
+function feature = compute_featurevector(I, idx, idy, patch_size)
 	% Args - 
 	%	I - image from which feature vector has to be calculated
 	% Returns
