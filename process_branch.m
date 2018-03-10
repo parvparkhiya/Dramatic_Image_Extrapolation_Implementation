@@ -1,5 +1,5 @@
 function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, refl)
-  %computeM where M is transformation matrix  
+  %computeM where M is transformation matrix
   patchsz=32;
 
   M=computeM(scal,rot,refl); %parv
@@ -64,6 +64,7 @@ function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, r
 
 %best_translation=maxk(Histogram);
 [~,best_translation]=sort(Histogram,'descend');
+best_translation=best_translation(1:50);
 num_patches=sum(Histogram(best_translation));
 
 end
