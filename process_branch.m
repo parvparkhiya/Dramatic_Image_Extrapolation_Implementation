@@ -1,4 +1,4 @@
-function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, refl)
+function [best_translation,maxTxTy,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, scal, rot, refl)
   %computeM where M is transformation matrix
   patchsz=32;
 
@@ -27,7 +27,7 @@ function [best_translation num_patches]=process_branch(Ig, Igi,Bgi, scal, rot, r
   end
 
   %iterate over all pixels in Ig - Igi
-  maxTxTy=sqrt((size(Igi,1)^2)+(size(Igi,2)^2));
+  maxTxTy=ceil(sqrt((size(Igi,1)^2)+(size(Igi,2)^2)));
   width_Ig=size(Ig,1);
   height_Ig=size(Ig,2);
   thresh=1000;  %change threshold
