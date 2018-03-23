@@ -1,8 +1,12 @@
 % take image input Ig and Ii
-Ig=double(imread('SourceImage/gate1_guide.jpg'))/255;
-Ii=double(imread('SourceImage/gate1_input.jpg'))/255;
+% Ig=double(imread('SourceImage/gate1_guide.jpg'))/255;
+% Ii=double(imread('SourceImage/gate1_input.jpg'))/255;
+clc;
+clear;
+Ig=double(imread('SourceImage/theater1_guide.jpg'))/255;
+Ii=double(imread('SourceImage/theater1_input.jpg'))/255;
 
-resize_factor=0.1;
+resize_factor=0.25;
 
 Ig=imresize(Ig,resize_factor);
 Ii=imresize(Ii,resize_factor);
@@ -16,7 +20,8 @@ Ii=imresize(Ii,resize_factor);
 % take bounding box for rough estimate
 % input format [xmin ymin width height]
 
-Bgi = ceil([265,392,1075,714]*resize_factor);
+% Bgi = ceil([265,392,1075,714]*resize_factor); % for gate
+Bgi = ceil([285,91,604,396]*resize_factor);  % for theater
 
 % create Igi image from above
 Igi = imcrop(Ig,Bgi);
@@ -34,6 +39,7 @@ refl = [-1, 1];
 b_idx = 0;
 
 % process each branch
+tic
 for s=1:size(scal,2)
 	for r=1:size(rot,2)
 		for re=1:size(refl,2)
@@ -48,7 +54,8 @@ for s=1:size(scal,2)
 	end
 	break;
 end
-
+timeis=toc;
+disp(timeis);
 % perform alpha expansion to get photomontage
 %transform_guide_map = get_photo_montage();
 
