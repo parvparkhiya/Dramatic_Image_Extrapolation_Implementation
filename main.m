@@ -6,7 +6,7 @@ clear;
 Ig=double(imread('SourceImage/theater1_guide.jpg'))/255;
 Ii=double(imread('SourceImage/theater1_input.jpg'))/255;
 
-resize_factor=0.25;
+resize_factor=1;
 
 Ig=imresize(Ig,resize_factor);
 Ii=imresize(Ii,resize_factor);
@@ -47,7 +47,7 @@ for s=1:size(scal,2)
 			% do something
 			% best_maps[b_idx] = process_branch(Ig, Igi, Ii, scal(s), rot(r), refl(re));
             [best_translation,maxTxTy,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re));
-			
+
 			break;
 		end
 		break;
