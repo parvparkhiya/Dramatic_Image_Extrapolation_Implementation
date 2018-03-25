@@ -9,7 +9,7 @@ Rect=zeros(2,2,2);
 % 285,91 Top left
 % 1796,91 Top right
 % 286,1019 Bottom left
-% 1796,1019 Bottom right
+% 1796,1019 Bottom right       
 width=604
 height=396
 Iiresz=imresize(Ii,[height width]);
