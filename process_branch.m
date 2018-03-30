@@ -19,8 +19,8 @@ function [best_translation,num_patches,contributor_histogram]=process_branch(Ig,
 
   %interior_feature=ones(size(Igi,1),size(Igi,2),(patchsz*patchsz*3)+hogsize)*(-1);
 
-  i1=ceil(patchsz/2):instepsz(1):(size(Igii,1)-floor(patchsz/2));
-  j1=ceil(patchsz/2):instepsz(2):(size(Igii,2)-floor(patchsz/2));
+  i1=floor(patchsz/2)+1:instepsz(1):(size(Igii,1)-ceil(patchsz/2)+1);
+  j1=floor(patchsz/2)+1:instepsz(2):(size(Igii,2)-ceil(patchsz/2)+1);
   interior_feature=zeros(size(i1,2)*size(j1,2),(patchsz*patchsz*3)+hogsize+2);
   %save feature vector(patchsz*patchsz*3)+hogsizes of all patches in interior of Igi
   %NOTE: not considering hog features
