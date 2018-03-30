@@ -64,11 +64,11 @@ for s=1:size(scal,2)
             disp(T_count);
             disp(num_patches);
             T_count=T_count+1;
-			% break;
+			break;
 		end
-		% break;
+		break;
 	end
-	% break;
+	break;
 end
 timeis=toc;
 disp(timeis);

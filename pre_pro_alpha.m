@@ -72,8 +72,8 @@ for i=1:best_t_count
 
 	I_temp(sy:syl,sx:sxl,:)=Iit(qy:qyl,qx:qxl,:);
 
-	% imshow(I_temp);
-	% waitforbuttonpress;
+	imshow(I_temp);
+	waitforbuttonpress;
 
 	for z3=1:3
 		for z1=1:size(t1,2)
