@@ -1,10 +1,5 @@
-function [best_translation,maxTxTy,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, scal, rot, refl)
+function [best_translation,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, scal, rot, refl,patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count)
   %computeM where M is transformation matrix
-  patchsz=32;
-  exstepsz=[16 16];
-  instepsz=[8 8];
-  hogsize=0;
-  K=5
 
 
   M=computeM(scal,rot,refl); %parv
@@ -33,7 +28,7 @@ function [best_translation,maxTxTy,num_patches,contributor_histogram]=process_br
   for i=i1
       for j=j1
         % if (i_min+i>=1 && i_max+i<=size(Igi,1) && j_min+j>=1 && j_max+j<=size(Igi,2)) %if tranformed_patch + (i,j) is contained in Igi
-          disp(strcat(num2str(i),'-',num2str(j)));
+          % disp(strcat(num2str(i),'-',num2str(j)));
           % interior_feature(i,j,:)=compute_featurevector(Igi,tranformed_patch,i,j,patchsz);
           %interior_feature(i,j,:)=compute_featurevector(Igii,i,j,patchsz);
           %interior_feature=[interior_feature;[i,j,compute_featurevector(Igii,i,j,patchsz)]];
@@ -44,17 +39,15 @@ function [best_translation,maxTxTy,num_patches,contributor_histogram]=process_br
   end
 
   %iterate over all pixels in Ig - Igi
-  maxTxTy=(2*ceil(sqrt((size(Ig,1)^2)+(size(Ig,2)^2))))+1;
-  thresh=10;  %change threshold
 %  feature_vector=zeros(width_Ig,height_Ig,(patchsz*patchsz*3)+hogsize);%change feature_sz
   contributor_histogram=cell(maxTxTy,maxTxTy);
   Histogram=zeros((maxTxTy*maxTxTy),1);
 
-  for i=ceil(patchsz/2)+1:exstepsz(1):(size(Ig,1)-floor(patchsz/2)-1)
-    for j=ceil(patchsz/2)+1:exstepsz(2):(size(Ig,2)-floor(patchsz/2)-1)
+  for i=floor(patchsz/2)+1:exstepsz(1):(size(Ig,1)-ceil(patchsz/2)+1)
+    for j=floor(patchsz/2)+1:exstepsz(2):(size(Ig,2)-ceil(patchsz/2)+1)
       delta_feature_vector=[];
-      strcat(num2str(i),'-',num2str(j))
-      if((i<Bgi(1) || (i>(Bgi(1)+Bgi(3)))) &&( j<Bgi(2) || j>(Bgi(2)+Bgi(4))))
+      % strcat(num2str(i),'-',num2str(j))
+      if(~((i>=Bgi(2) && i<=(Bgi(2)+Bgi(4))) && (j>=Bgi(1) && j<=(Bgi(1)+Bgi(3)))))
       %  feature_vector(i,j,:)=compute_featurevector(Ig,i,j,patchsz);
         feature_vector=compute_featurevector(Ig,i,j,patchsz);
 
@@ -82,10 +75,10 @@ function [best_translation,maxTxTy,num_patches,contributor_histogram]=process_br
             delta_feature_vector=delta_feature_vector((end-K1+1):end,:);
 
             for kk=1:K1
-              Tx=Bgi(1)+delta_feature_vector(kk,2)-1-i+floor(maxTxTy/2)+1;
-              Ty=Bgi(2)+delta_feature_vector(kk,3)-1-j+floor(maxTxTy/2)+1;
-             Histogram((maxTxTy*Tx)+Ty)=Histogram((maxTxTy*Tx)+Ty)+1;
-             contributor_histogram{Tx,Ty}=[contributor_histogram{Tx,Ty};i,j];
+              Ty=Bgi(2)+delta_feature_vector(kk,2)-1-i+floor(maxTxTy/2)+1;
+              Tx=Bgi(1)+delta_feature_vector(kk,3)-1-j+floor(maxTxTy/2)+1;
+              Histogram((maxTxTy*Tx)+Ty)=Histogram((maxTxTy*Tx)+Ty)+1;
+              contributor_histogram{Tx,Ty}=[contributor_histogram{Tx,Ty};i,j];
             end
           end
       end
@@ -94,7 +87,6 @@ function [best_translation,maxTxTy,num_patches,contributor_histogram]=process_br
 
   %best_translation=maxk(Histogram);
   [~,best_translation]=sort(Histogram,'descend');
-  best_translation=best_translation(1:50);
+  best_translation=best_translation(1:best_t_count);
   num_patches=sum(Histogram(best_translation));
-
 end
