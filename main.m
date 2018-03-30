@@ -21,7 +21,9 @@ Ii=imresize(Ii,resize_factor);
 % input format [xmin ymin width height]
 
 % Bgi = ceil([265,392,1075,714]*resize_factor); % for gate
-Bgi = ceil([285,91,604,396]*resize_factor);  % for theater
+% old  Bgi = ceil([285,91,604,396]*resize_factor);  % for theater
+Bgi = ceil([141,45,745,458]*resize_factor);  % for theater
+Ii = imresize(Ii,[Bgi(4) Bgi(3)]);
 
 % create Igi image from above
 Igi = imcrop(Ig,Bgi);
@@ -31,6 +33,17 @@ Igi = imcrop(Ig,Bgi);
 scal = linspace(0.5, 2.0, 11);
 rot = linspace(-45, 45, 11);
 refl = [-1, 1];
+
+patchsz=32;
+exstepsz=[16 16];
+instepsz=[8 8];
+hogsize=0;
+K=5;
+best_t_count=50;
+C=2; 
+
+maxTxTy=(2*ceil(sqrt((size(Ig,1)^2)+(size(Ig,2)^2))))+1;
+thresh=10;  %while picking top 5 neartest neighbour
 
 % initialize datastructure to store the best value for each branch
 % best_maps = []
@@ -46,7 +59,7 @@ for s=1:size(scal,2)
 			b_idx =b_idx+1;
 			% do something
 			% best_maps[b_idx] = process_branch(Ig, Igi, Ii, scal(s), rot(r), refl(re));
-            [best_translation,maxTxTy,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re));
+            [best_translation,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re),patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);
 
 			break;
 		end
