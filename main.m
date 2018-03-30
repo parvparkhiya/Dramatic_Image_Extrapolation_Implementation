@@ -36,14 +36,14 @@ refl = [-1, 1];
 
 patchsz=32;
 exstepsz=[16 16];
-instepsz=[8 8];
+instepsz=[16 16];
 hogsize=0;
 K=5;
 best_t_count=50;
 C=2; 
 
 maxTxTy=(2*ceil(sqrt((size(Ig,1)^2)+(size(Ig,2)^2))))+1;
-thresh=10;  %while picking top 5 neartest neighbour
+thresh=100;  %while picking top 5 neartest neighbour
 
 % initialize datastructure to store the best value for each branch
 % best_maps = []
@@ -51,6 +51,7 @@ thresh=10;  %while picking top 5 neartest neighbour
 % initialize branch index to keep track of branch_num (for indexing of final maps)
 b_idx = 0;
 
+T_count=1;
 % process each branch
 tic
 for s=1:size(scal,2)
@@ -60,12 +61,14 @@ for s=1:size(scal,2)
 			% do something
 			% best_maps[b_idx] = process_branch(Ig, Igi, Ii, scal(s), rot(r), refl(re));
             [best_translation,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re),patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);
-
-			break;
+            disp(T_count);
+            disp(num_patches);
+            T_count=T_count+1;
+			% break;
 		end
-		break;
+		% break;
 	end
-	break;
+	% break;
 end
 timeis=toc;
 disp(timeis);
