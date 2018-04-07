@@ -3,7 +3,7 @@
 clear;
 clc;
 close all;
-load('temp_result/one_T.mat');
+load('temp_result/try_with_hog.mat');
 
 
 uninary_file=fopen('temp_result/uninary_cost.txt','w');

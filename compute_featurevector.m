@@ -8,5 +8,6 @@ function feature = compute_featurevector(I, idx, idy, patch_size)
 	 % size(Is)
 	 % disp(idx);
 	 % disp(idy);
-	feature = reshape(Is, [1, size(Is,1)*size(Is,2)*size(Is,3)]);
+	feature = zeros([1 patch_size*patch_size*3]);
+	feature = [feature, extractHOGFeatures(Is)];
 end

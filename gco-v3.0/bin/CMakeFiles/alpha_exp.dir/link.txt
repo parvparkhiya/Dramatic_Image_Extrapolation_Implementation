@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG  -rdynamic CMakeFiles/alpha_exp.dir/alpha_exp.cpp.o  -o alpha_exp libgco.a 
