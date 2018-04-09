@@ -6,7 +6,7 @@ clear;
 Ig=double(imread('SourceImage/theater1_guide.jpg'))/255;
 Ii=double(imread('SourceImage/theater1_input.jpg'))/255;
 
-resize_factor=1;
+resize_factor=0.5;
 
 Ig=imresize(Ig,resize_factor);
 Ii=imresize(Ii,resize_factor);
@@ -36,7 +36,7 @@ refl = [-1, 1];
 
 patchsz=32;
 exstepsz=[16 16];
-instepsz=[16 16];
+instepsz=[8 8];
 hogsize=324;
 K=5;
 best_t_count=50;
@@ -60,7 +60,14 @@ for s=1:size(scal,2)
 			b_idx =b_idx+1;
 			% do something
 			% best_maps[b_idx] = process_branch(Ig, Igi, Ii, scal(s), rot(r), refl(re));
-            [best_translation,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re),patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);
+            % [best_translation,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re),patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);
+          	% remember to change below
+          	% remember to change below
+          	% remember to change below
+          	% remember to change below
+          	% remember to change below
+          	% remember to change below
+            [best_translation,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, 1.25, 0, 0,patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);            
             disp(T_count);
             disp(num_patches);
             T_count=T_count+1;

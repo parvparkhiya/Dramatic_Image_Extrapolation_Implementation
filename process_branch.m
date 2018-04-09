@@ -46,7 +46,7 @@ function [best_translation,num_patches,contributor_histogram]=process_branch(Ig,
   for i=floor(patchsz/2)+1:exstepsz(1):(size(Ig,1)-ceil(patchsz/2)+1)
     for j=floor(patchsz/2)+1:exstepsz(2):(size(Ig,2)-ceil(patchsz/2)+1)
       delta_feature_vector=[];
-      % strcat(num2str(i),'-',num2str(j))
+      strcat(num2str(i),'-',num2str(j))
       if(~((i>=Bgi(2) && i<=(Bgi(2)+Bgi(4))) && (j>=Bgi(1) && j<=(Bgi(1)+Bgi(3)))))
       %  feature_vector(i,j,:)=compute_featurevector(Ig,i,j,patchsz);
         feature_vector=compute_featurevector(Ig,i,j,patchsz);
