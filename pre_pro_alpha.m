@@ -13,11 +13,11 @@ smooth_file=fopen('temp_result/raw_smoothness_cost.txt','w');
 t1=floor(patchsz/2)+1:exstepsz(1):(size(Ig,1)-ceil(patchsz/2)+1);
 t2=floor(patchsz/2)+1:exstepsz(2):(size(Ig,2)-ceil(patchsz/2)+1);
 
-fprintf(uninary_file,'%d %d %d\n',size(t1,2),size(t2,2),best_t_count); 
-fprintf(smooth_file,'%d %d %d\n',size(t1,2),size(t2,2),best_t_count); 
+fprintf(uninary_file,'%d %d %d\n',size(t1,2),size(t2,2),best_t_count);
+fprintf(smooth_file,'%d %d %d\n',size(t1,2),size(t2,2),best_t_count);
 
 total_cost=ones(best_t_count,size(t1,2)*size(t2,2))*1000;
-
+transformation_index=1;
 for i=1:best_t_count
 	Tx=floor(best_translation(i)/maxTxTy);
 	Ty=mod(best_translation(i),maxTxTy);
@@ -28,7 +28,7 @@ for i=1:best_t_count
 		ti=((ti-(floor(patchsz/2)+1))/exstepsz(1))+1;
 		tj=((tj-(floor(patchsz/2)+1))/exstepsz(2))+1;
 		total_cost(i,(size(t2,2)*(ti-1))+tj)=0;
-	end	
+	end
 	sx=Bgi(1)-(Tx-(floor(maxTxTy/2)+1));
 	sy=Bgi(2)-(Ty-(floor(maxTxTy/2)+1));
 
@@ -72,8 +72,9 @@ for i=1:best_t_count
 
 	I_temp(sy:syl,sx:sxl,:)=Iit(qy:qyl,qx:qxl,:);
 
-	imshow(I_temp);
-	waitforbuttonpress;
+	%imshow(I_temp);
+	imwrite(I_temp,strcat('temp_images_alpha/',num2str(transformation_index),'_',num2str(i),'.jpg'));
+	%waitforbuttonpress;
 
 	for z3=1:3
 		for z1=1:size(t1,2)
