@@ -3,7 +3,7 @@
 clear;
 clc;
 close all;
-load('temp_result/try_with_hog.mat');
+load('temp_result/mid_T.mat');
 
 
 uninary_file=fopen('temp_result/uninary_cost.txt','w');
@@ -41,7 +41,8 @@ for i=1:best_t_count
 	end
 
 	I_temp=zeros(size(Ig));
-	Iit=transform_im(Ii,scal(s),rot(r),refl(re));
+	% Iit=transform_im(Ii,scal(s),rot(r),refl(re));
+	Iit=transform_im(Ii,1.25,0,0);
 
 	qx=1;
 	qy=1;
