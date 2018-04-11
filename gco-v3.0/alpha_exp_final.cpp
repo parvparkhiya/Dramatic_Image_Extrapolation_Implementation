@@ -1,5 +1,5 @@
 /*
-    This file is used to call the alpha exansion for the problem.
+    This file is used to call the alpha expansion for getting final photomontage.
 */
 
 #include <stdio.h>
@@ -9,6 +9,7 @@
 #include <time.h>
 #include <fstream>
 #include <iostream>
+
 #include <sstream>
 #include "GCoptimization.h"
 
@@ -35,7 +36,7 @@ class Data {
         int *get_smooth_cost() {
             return smooth_data_;
         }
-
+  
         int *get_shift_map(){
           return shift_map_();
         }
@@ -77,13 +78,16 @@ class Data {
                 g >> smooth_data_[i];
             }
           for(int i=0;i<width_*height_;i++)
-          {      h>>shift_map_[i];
+          {
+            h>>shift_map_[i];
           }
         }
 
     private:
         int width_, height_, num_labels_;
+
         int *data_, *smooth_data_,*shift_map_;
+
 
 };
 
@@ -91,7 +95,9 @@ struct ForDataFn {
     int num_labels, height, width;
     int *data;
     int *smooth_data;
+
     int *shift_map;
+
 };
 
 int dataFn(int pixel, int label, void *data) {
@@ -106,6 +112,7 @@ int dataFn(int pixel, int label, void *data) {
     int dest = label * width * height + pixel;
     return my_data->data[dest];
 }
+
 
 int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
 
@@ -137,6 +144,50 @@ int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
         energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B));
 }
 
+int smoothFinalFn(int pixel1, int pixel2, int label1, int label2, void *data) {
+
+    if (label1 == label2) {
+        return 0;
+    }
+
+    // transformation label must start from 0
+    ForDataFn *my_data = (ForDataFn *) data;
+
+    ForDataFn *data_label1,*data_label2;
+
+    data_label1 = data_label1 + label1;
+    data_label2 = data_label2 + label2;
+
+    // my_data would point to data of first transformation and width height should be same for all transformation data 
+    int imgW = my_data->width;
+    int imgH = my_data->height;
+
+    int *shiftmap_label1 = data_label1->shift_map;
+    int *shiftmap_label2 = data_label2->shift_map;
+
+    int translation_label1=shiftmap_label1[pixel1];
+    int translation_label2=shiftmap_label2[pixel2];
+
+    // locij implies location of pixel i in image with label j;
+    int loc11 = translation_label1*imgW*imgH*3 + pixel1;
+    int loc12 = translation_label2*imgW*imgH*3 + pixel1;
+    int loc21 = translation_label1*imgW*imgH*3 + pixel2;
+    int loc22 = translation_label2*imgW*imgH*3 + pixel2;
+
+    int *mdata_label1=data_label1->smooth_data;
+    int *mdata_label2=data_label2->smooth_data;
+
+    float energy_diff_1_R = (float) (mdata_label1[loc11] - mdata_label2[loc12]);
+    float energy_diff_1_G = (float) (mdata_label1[loc11 + imgW*imgH] - mdata_label2[loc12 + imgW*imgH]);
+    float energy_diff_1_B = (float) (mdata_label1[loc11 + 2*imgW*imgH] - mdata_label2[loc12 + 2*imgW*imgH]);
+
+    float energy_diff_2_R = (float) (mdata_label2[loc22] - mdata_label1[loc21]);
+    float energy_diff_2_G = (float) (mdata_label2[loc22 + imgW*imgH] - mdata_label1[loc21 + imgW*imgH]);
+    float energy_diff_2_B = (float) (mdata_label2[loc22 + 2*imgW*imgH] - mdata_label1[loc21 + 2*imgW*imgH]);
+
+    return (int) (sqrt(energy_diff_1_R*energy_diff_1_R + energy_diff_1_G*energy_diff_1_G + energy_diff_1_B*energy_diff_1_B) + sqrt(
+        energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B));
+}
 int main() {
 
     int num_transformation_label,j;
@@ -180,6 +231,7 @@ int main() {
     for (int i = 0; i < result_size; i++) {
         fout << gc->whatLabel(i) << " ";
     }
+
 
     return 0;
 }
