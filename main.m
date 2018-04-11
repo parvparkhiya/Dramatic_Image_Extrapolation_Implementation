@@ -51,7 +51,10 @@ thresh=100;  %while picking top 5 neartest neighbour
 % initialize branch index to keep track of branch_num (for indexing of final maps)
 b_idx = 0;
 
-T_count=1;
+best_translation=zeros(best_t_count,size(scal,2)*size(rot,2)*size(refl,2));
+num_patches=zeros(size(scal,2)*size(rot,2)*size(refl,2),1);
+contributor_histogram=cell(size(scal,2)*size(rot,2)*size(refl,2),1);
+
 % process each branch
 tic
 for s=1:size(scal,2)
@@ -60,22 +63,22 @@ for s=1:size(scal,2)
 			b_idx =b_idx+1;
 			% do something
 			% best_maps[b_idx] = process_branch(Ig, Igi, Ii, scal(s), rot(r), refl(re));
-            % [best_translation,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re),patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);
+            [best_translation(:,b_idx),num_patches(b_idx),contributor_histogram{b_idx}]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re),patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);
           	% remember to change below
           	% remember to change below
           	% remember to change below
           	% remember to change below
           	% remember to change below
           	% remember to change below
-            [best_translation,num_patches,contributor_histogram]=process_branch(Ig, Igi,Bgi, 1.25, 0, 0,patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);            
-            disp(T_count);
-            disp(num_patches);
-            T_count=T_count+1;
-			break;
+            % [best_translation(:,b_idx),num_patches(b_idx),contributor_histogram{b_idx}]=process_branch(Ig, Igi,Bgi, 1.25, 0, 0,patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);            
+            disp(b_idx);
+            disp(num_patches(b_idx));
+            save('temp_result/down_point_5_theatre.mat');
+			% break;
 		end
-		break;
+		% break;
 	end
-	break;
+	% break;
 end
 timeis=toc;
 disp(timeis);
