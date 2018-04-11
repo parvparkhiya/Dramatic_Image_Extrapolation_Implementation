@@ -1,5 +1,6 @@
 /*
-    This file is used to call the alpha exansion for the problem.
+    This file is used to call the final alpha expansion for the problem to get
+    photomontage.
 */
 
 #include <stdio.h>
@@ -8,7 +9,6 @@
 #include <string>
 #include <time.h>
 #include <fstream>
-#include <cstdlib>
 #include <iostream>
 #include "GCoptimization.h"
 
@@ -87,6 +87,28 @@ struct ForDataFn {
     int *smooth_data;
 };
 
+int dataFinalFn(int pixel, int label, void *data) {
+    ForDataFn *my_data = (ForDataFn *) data + label;
+    int height = my_data->height;
+    int width = my_data->width;
+    int x = pixel / width;
+    int y = pixel % width;
+    // for pixel (x,y) neighbors are (x-1, y), (x+1, y), (x, y-1), (x, y+1)
+    int neighbors[4] = { width*(x-1) + y, width*(x+1) + y, width*x + y - 1, width*x + y + 1};
+
+    int un_cost = dataFn(pixel, my_data->shift_map[pixel], (void *) my_data);
+    int sm_cost = 0;
+    for(int i = 0; i < 4; i++) {
+        if(neighbors[i] < 0 or neighbors[i] >= height*width) {
+            continue;
+        }
+        sm_cost += smoothFn(
+            pixel, neighbors[i], my_data->shift_map[pixel], my_data->shift_map[neighbors[i]], (void *)my_data);
+
+    }
+    return un_cost + sm_cost;
+}
+
 int dataFn(int pixel, int label, void *data) {
     ForDataFn *my_data = (ForDataFn *) data;
 
@@ -130,16 +152,10 @@ int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
         energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B));
 }
 
-int main(int argc, char **argv) {
-    if(argc < 2) {
-        exit(1);
-    }
-    int idx = atoi(argv[1]);
-    string dir = "../../temp_result/";
-
-    string fname = dir + "uninary_cost_" + to_string(idx) + ".txt";
-    string gname = dir + "raw_smoothness_cost_" + to_string(idx)  + ".txt";
-    string output_file = dir + "temp_result_" + to_string(idx) + ".txt";
+int main() {
+    string fname = "../../temp_result/uninary_cost.txt";
+    string gname = "../../temp_result/raw_smoothness_cost.txt";
+    string output_file = "../../temp_result/temp_result.txt";
 
     Data data(fname, gname);
     //data.print_data();
