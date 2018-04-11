@@ -38,7 +38,7 @@ class Data {
         }
   
         int *get_shift_map(){
-          return shift_map_();
+          return shift_map_;
         }
 
         void print_data() {
@@ -114,6 +114,8 @@ int dataFn(int pixel, int label, void *data) {
 }
 
 
+
+
 int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
 
     if (label1 == label2) {
@@ -143,6 +145,29 @@ int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
     return (int) (sqrt(energy_diff_1_R*energy_diff_1_R + energy_diff_1_G*energy_diff_1_G + energy_diff_1_B*energy_diff_1_B) + sqrt(
         energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B));
 }
+
+int dataFinalFn(int pixel, int label, void *data) {
+    ForDataFn *my_data = (ForDataFn *) data + label;
+    int height = my_data->height;
+    int width = my_data->width;
+    int x = pixel / width;
+    int y = pixel % width;
+    // for pixel (x,y) neighbors are (x-1, y), (x+1, y), (x, y-1), (x, y+1)
+    int neighbors[4] = { width*(x-1) + y, width*(x+1) + y, width*x + y - 1, width*x + y + 1};
+
+    int un_cost = dataFn(pixel, my_data->shift_map[pixel], (void *) my_data);
+    int sm_cost = 0;
+    for(int i = 0; i < 4; i++) {
+        if(neighbors[i] < 0 or neighbors[i] >= height*width) {
+            continue;
+        }
+        sm_cost += smoothFn(
+            pixel, neighbors[i], my_data->shift_map[pixel], my_data->shift_map[neighbors[i]], (void *)my_data);
+
+    }
+    return un_cost + sm_cost;
+}
+
 
 int smoothFinalFn(int pixel1, int pixel2, int label1, int label2, void *data) {
 
@@ -196,7 +221,7 @@ int main() {
     stringstream Gname;
     stringstream Shift_map;
     string output_file = "../../temp_result/final_output_result.txt";
-    Data *data=new Data[20];
+
     Data data[20];
     ForDataFn data_fn[20];
     for(j=0;j<num_transformation_label;j++)

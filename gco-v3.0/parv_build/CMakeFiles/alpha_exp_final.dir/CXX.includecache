@@ -33,6 +33,8 @@ fstream
 -
 iostream
 -
+sstream
+-
 GCoptimization.h
 /home/parv/Dramatic_Image_Extrapolation_Implementation/gco-v3.0/GCoptimization.h
 
