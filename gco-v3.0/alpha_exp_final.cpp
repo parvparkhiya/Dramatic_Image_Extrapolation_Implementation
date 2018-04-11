@@ -1,5 +1,5 @@
 /*
-    This file is used to call the alpha exansion for the problem.
+    This file is used to call the alpha expansion for getting final photomontage.
 */
 
 #include <stdio.h>
@@ -9,10 +9,12 @@
 #include <time.h>
 #include <fstream>
 #include <iostream>
+
+#include <sstream>
 #include "GCoptimization.h"
 
 using namespace std;
-
+//shift_map_array
 class Data {
     public:
         int get_width() {
@@ -34,6 +36,10 @@ class Data {
         int *get_smooth_cost() {
             return smooth_data_;
         }
+  
+        int *get_shift_map(){
+          return shift_map_();
+        }
 
         void print_data() {
             cout << width_ << " " << height_ << " " << num_labels_ << endl;
@@ -48,35 +54,40 @@ class Data {
             }
         }
 
-
-        Data(string ufilename, string sfilename) {
+        Data(){
+          ;
+        }
+        void init(string ufilename, string sfilename,string smapfilename) {
             ifstream f(ufilename);
-	        ifstream g(sfilename);
-
+            ifstream g(sfilename);
+            ifstream h(smapfilename);
             f >> width_ >> height_ >> num_labels_;
-
             // assuming data is aligned in a single array row wise for each label.
             // i.e l1d11 l1d12 .. l1d21 l1d22 .. ... l2d11 l2d12 ..
             data_ = new int[num_labels_ * width_ * height_];
-
             for(int i = 0; i < num_labels_ * width_ * height_; i++) {
                 f >> data_[i];
             }
-
             // assuming all data for R for one image comes first followed by G and B for
             // each label.
             smooth_data_ = new int[num_labels_ * width_ * height_ * 3];
-	        int temp;
-	        g >> temp >> temp >> temp;
-
+            shift_map_ = new int[num_labels_*width_*height_];
+           int temp;
+            g >> temp >> temp >> temp;
             for(int i = 0; i < num_labels_ * width_ * height_ * 3; i++) {
                 g >> smooth_data_[i];
             }
+          for(int i=0;i<width_*height_;i++)
+          {
+            h>>shift_map_[i];
+          }
         }
 
     private:
         int width_, height_, num_labels_;
-        int *data_, *smooth_data_;
+
+        int *data_, *smooth_data_,*shift_map_;
+
 
 };
 
@@ -84,6 +95,9 @@ struct ForDataFn {
     int num_labels, height, width;
     int *data;
     int *smooth_data;
+
+    int *shift_map;
+
 };
 
 int dataFn(int pixel, int label, void *data) {
@@ -174,34 +188,50 @@ int smoothFinalFn(int pixel1, int pixel2, int label1, int label2, void *data) {
     return (int) (sqrt(energy_diff_1_R*energy_diff_1_R + energy_diff_1_G*energy_diff_1_G + energy_diff_1_B*energy_diff_1_B) + sqrt(
         energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B));
 }
-
 int main() {
-    string fname = "../../temp_result/uninary_cost.txt";
-    string gname = "../../temp_result/raw_smoothness_cost.txt";
-    string output_file = "../../temp_result/temp_result.txt";
 
-    Data data(fname, gname);
-    //data.print_data();
+    int num_transformation_label,j;
+    num_transformation_label=20;
+    stringstream Fname;
+    stringstream Gname;
+    stringstream Shift_map;
+    string output_file = "../../temp_result/final_output_result.txt";
+    Data *data=new Data[20];
+    Data data[20];
+    ForDataFn data_fn[20];
+    for(j=0;j<num_transformation_label;j++)
+    {
+      Fname.str("");
+      Gname.str("");
+      Shift_map.str("");
+      Fname<<"../../temp_result/uninary_cost_"<<j<<".txt";
+      Gname<<"../../temp_result/raw_smoothness_cost_"<<j<<".txt";
+      Shift_map<<"../../temp_result/shift_map_"<<j<<".txt";
+      string fname=Fname.str();
+      string gname=Gname.str();
+      string shift_mapname=Shift_map.str();
+      //Data1[j](fname,gname,shift_map);
+      data[j].init(fname,gname,shift_mapname);
+      data_fn[j].num_labels = data[j].get_num_labels();
+      data_fn[j].width = data[j].get_width();
+      data_fn[j].height = data[j].get_height();
+      data_fn[j].data = data[j].get_unary_cost();
+      data_fn[j].smooth_data = data[j].get_smooth_cost();
+  }
+    GCoptimizationGridGraph *gc = new GCoptimizationGridGraph(data[0].get_width(), data[0].get_height(),num_transformation_label);
 
-    GCoptimizationGridGraph *gc = new GCoptimizationGridGraph(data.get_width(), data.get_height(), data.get_num_labels());
-    ForDataFn data_fn;
-    data_fn.num_labels = data.get_num_labels();
-    data_fn.width = data.get_width();
-    data_fn.height = data.get_height();
-    data_fn.data = data.get_unary_cost();
-    data_fn.smooth_data = data.get_smooth_cost();
-
-    gc->setDataCost(&dataFn, &data_fn);
-    gc->setSmoothCost(&smoothFn, &data_fn);
+    gc->setDataCost(&dataFinalFn, data_fn);
+    gc->setSmoothCost(&smoothFinalFn, data_fn);
     gc-> expansion(50);
 
-    int result_size = data.get_width() * data.get_height();
-    
+    int result_size = data[0].get_width() * data[0].get_height();
+
     ofstream fout(output_file);
-    
+
     for (int i = 0; i < result_size; i++) {
         fout << gc->whatLabel(i) << " ";
     }
-   
+
+
     return 0;
 }
