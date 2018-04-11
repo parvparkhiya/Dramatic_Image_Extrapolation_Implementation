@@ -21,11 +21,14 @@ set(example_srcs
     example.cpp)
 
 set(alpha_exp_srcs alpha_exp.cpp)
+set(alpha_exp_final_srcs alpha_exp_final.cpp)
 
 add_library(gco ${lib_srcs})
 add_executable(example ${example_srcs})
 add_executable(alpha_exp ${alpha_exp_srcs})
+add_executable(alpha_exp_final ${alpha_exp_final_srcs})
 target_link_libraries(alpha_exp gco)
+target_link_libraries(alpha_exp_final gco)
 target_link_libraries(example gco)
 
 install(TARGETS gco
