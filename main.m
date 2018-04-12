@@ -82,6 +82,9 @@ for s=1:size(scal,2)
 			% do something
 			% best_maps[b_idx] = process_branch(Ig, Igi, Ii, scal(s), rot(r), refl(re));
             [best_translation(:,b_idx),num_patches(b_idx),contributor_histogram{b_idx}]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re),patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);
+            thist=contributor_histogram{b_idx};
+            save(strcat('temp_result/contributor_histogram/',num2str(b_idx),'.mat'),'thist');
+
             % remember to change below
           	% remember to change below
           	% remember to change below
@@ -100,6 +103,12 @@ for s=1:size(scal,2)
 end
 timeis=toc;
 disp(timeis);
+
+%%
+% for i=1:size(contributor_histogram,1)
+%     thist=contributor_histogram{i};
+%     save(strcat('temp_result/contributor_histogram/',num2str(i),'.mat'),'thist');
+% end
 % perform alpha expansion to get photomontage
 %transform_guide_map = get_photo_montage();
 
