@@ -77,6 +77,9 @@ function [best_translation,num_patches,contributor_histogram]=process_branch(Ig,
             for kk=1:K1
               Ty=Bgi(2)+delta_feature_vector(kk,2)-1-i+floor(maxTxTy/2)+1;
               Tx=Bgi(1)+delta_feature_vector(kk,3)-1-j+floor(maxTxTy/2)+1;
+              if (((maxTxTy*Tx)+Ty)>maxTxTy*maxTxTy)
+                'nothing;'
+              end
               Histogram((maxTxTy*Tx)+Ty)=Histogram((maxTxTy*Tx)+Ty)+1;
               contributor_histogram{Tx,Ty}=[contributor_histogram{Tx,Ty};i,j];
             end
