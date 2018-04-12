@@ -131,37 +131,41 @@ int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
 }
 
 int main(int argc, char **argv) {
-    if(argc < 2) {
-        exit(1);
-    }
-    int idx = atoi(argv[1]);
-    string dir = "../../temp_result/";
+    // if(argc < 2) {
+    //     exit(1);
+    // }
+    //int idx = atoi(argv[1]);
+    string dir, fname, gname, output_file;
+    for(int i = 0; i < 20; i++) {
+        int idx = i;
+        dir = "../../temp_result/";
 
-    string fname = dir + "uninary_cost_" + to_string(idx) + ".txt";
-    string gname = dir + "raw_smoothness_cost_" + to_string(idx)  + ".txt";
-    string output_file = dir + "temp_result_" + to_string(idx) + ".txt";
+        fname = dir + "uninary_cost_" + to_string(idx) + ".txt";
+        gname = dir + "raw_smoothness_cost_" + to_string(idx)  + ".txt";
+        output_file = dir + "shift_map_" + to_string(idx) + ".txt";
 
-    Data data(fname, gname);
-    //data.print_data();
+        Data data(fname, gname);
+        //data.print_data();
 
-    GCoptimizationGridGraph *gc = new GCoptimizationGridGraph(data.get_width(), data.get_height(), data.get_num_labels());
-    ForDataFn data_fn;
-    data_fn.num_labels = data.get_num_labels();
-    data_fn.width = data.get_width();
-    data_fn.height = data.get_height();
-    data_fn.data = data.get_unary_cost();
-    data_fn.smooth_data = data.get_smooth_cost();
+        GCoptimizationGridGraph *gc = new GCoptimizationGridGraph(data.get_width(), data.get_height(), data.get_num_labels());
+        ForDataFn data_fn;
+        data_fn.num_labels = data.get_num_labels();
+        data_fn.width = data.get_width();
+        data_fn.height = data.get_height();
+        data_fn.data = data.get_unary_cost();
+        data_fn.smooth_data = data.get_smooth_cost();
 
-    gc->setDataCost(&dataFn, &data_fn);
-    gc->setSmoothCost(&smoothFn, &data_fn);
-    gc-> expansion(50);
+        gc->setDataCost(&dataFn, &data_fn);
+        gc->setSmoothCost(&smoothFn, &data_fn);
+        gc-> expansion(50);
 
-    int result_size = data.get_width() * data.get_height();
-    
-    ofstream fout(output_file);
-    
-    for (int i = 0; i < result_size; i++) {
-        fout << gc->whatLabel(i) << " ";
+        int result_size = data.get_width() * data.get_height();
+        
+        ofstream fout(output_file);
+        
+        for (int i = 0; i < result_size; i++) {
+            fout << gc->whatLabel(i) << " ";
+        }
     }
    
     return 0;
