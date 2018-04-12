@@ -95,7 +95,6 @@ struct ForDataFn {
     int num_labels, height, width;
     int *data;
     int *smooth_data;
-
     int *shift_map;
 
 };
@@ -143,7 +142,7 @@ int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
     float energy_diff_2_B = (float) (mdata[loc22 + 2*imgW*imgH] - mdata[loc21 + 2*imgW*imgH]);
 
     return (int) (sqrt(energy_diff_1_R*energy_diff_1_R + energy_diff_1_G*energy_diff_1_G + energy_diff_1_B*energy_diff_1_B) + sqrt(
-        energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B));
+        energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B))+10;
 }
 
 int dataFinalFn(int pixel, int label, void *data) {
@@ -180,8 +179,8 @@ int smoothFinalFn(int pixel1, int pixel2, int label1, int label2, void *data) {
 
     ForDataFn *data_label1,*data_label2;
 
-    data_label1 = data_label1 + label1;
-    data_label2 = data_label2 + label2;
+    data_label1 = my_data + label1;
+    data_label2 = my_data + label2;
 
     // my_data would point to data of first transformation and width height should be same for all transformation data 
     int imgW = my_data->width;
@@ -211,7 +210,7 @@ int smoothFinalFn(int pixel1, int pixel2, int label1, int label2, void *data) {
     float energy_diff_2_B = (float) (mdata_label2[loc22 + 2*imgW*imgH] - mdata_label1[loc21 + 2*imgW*imgH]);
 
     return (int) (sqrt(energy_diff_1_R*energy_diff_1_R + energy_diff_1_G*energy_diff_1_G + energy_diff_1_B*energy_diff_1_B) + sqrt(
-        energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B));
+        energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B))+10;
 }
 int main() {
 
@@ -220,7 +219,8 @@ int main() {
     stringstream Fname;
     stringstream Gname;
     stringstream Shift_map;
-    string output_file = "../../temp_result/final_output_result.txt";
+    string output_file_transformation = "../../temp_result/final_output_transformation.txt";
+    string output_file_translation = "../../temp_result/final_output_translation.txt";
 
     Data data[20];
     ForDataFn data_fn[20];
@@ -242,21 +242,30 @@ int main() {
       data_fn[j].height = data[j].get_height();
       data_fn[j].data = data[j].get_unary_cost();
       data_fn[j].smooth_data = data[j].get_smooth_cost();
+      data_fn[j].shift_map = data[j].get_shift_map();
   }
     GCoptimizationGridGraph *gc = new GCoptimizationGridGraph(data[0].get_width(), data[0].get_height(),num_transformation_label);
 
     gc->setDataCost(&dataFinalFn, data_fn);
     gc->setSmoothCost(&smoothFinalFn, data_fn);
-    gc-> expansion(50);
+    gc-> expansion(0);
+
+    // cout << "testing" <<endl;
 
     int result_size = data[0].get_width() * data[0].get_height();
 
-    ofstream fout(output_file);
+    ofstream ftfout(output_file_transformation);
+    ofstream ftlout(output_file_translation);
 
     for (int i = 0; i < result_size; i++) {
-        fout << gc->whatLabel(i) << " ";
+        ftfout << gc->whatLabel(i) << " ";
     }
 
+
+    for (int i = 0; i < result_size; i++) {     
+        ftlout << data_fn[gc->whatLabel(i)].shift_map[i] << " "; 
+    
+    }
 
     return 0;
 }
