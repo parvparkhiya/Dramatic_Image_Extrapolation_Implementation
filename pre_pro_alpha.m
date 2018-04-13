@@ -31,6 +31,10 @@ for(k1=0:num_transformation_count-1)
 	smooth_file=fopen(strcat('temp_result/raw_smoothness_cost_',num2str(k1),'.txt'),'w');
 
 
+	% t1=floor(patchsz/2)+1:exstepsz(1):(size(Ig,1)-ceil(patchsz/2)+1);
+	% t2=floor(patchsz/2)+1:exstepsz(2):(size(Ig,2)-ceil(patchsz/2)+1);
+
+	
 	t1=floor(patchsz/2)+1:exstepsz(1):(size(Ig,1)-ceil(patchsz/2)+1);
 	t2=floor(patchsz/2)+1:exstepsz(2):(size(Ig,2)-ceil(patchsz/2)+1);
 
@@ -45,24 +49,10 @@ for(k1=0:num_transformation_count-1)
 		Tx=floor(best_translation(i,torder(k1+1))/maxTxTy);
 		Ty=mod(best_translation(i,torder(k1+1)),maxTxTy);
 		% contributors=contributor_histogram{torder(k1+1)}{Tx,Ty};
-		contributors=tcontributor_histogram{Tx,Ty};
-		for z1=1:size(contributors,1)
-			ti=contributors(z1,1);
-			tj=contributors(z1,2);
-			ti=((ti-(floor(patchsz/2)+1))/exstepsz(1))+1;
-			tj=((tj-(floor(patchsz/2)+1))/exstepsz(2))+1;
-			total_cost(i,(size(t2,2)*(ti-1))+tj)=0;
-		end
+
 		sx=Bgi(1)-(Tx-(floor(maxTxTy/2)+1));
 		sy=Bgi(2)-(Ty-(floor(maxTxTy/2)+1));
 
-		for z1=1:size(t1,2)
-			for z2=1:size(t2,2)
-				if(total_cost(i,(size(t2,2)*(z1-1))+z2)~=0 &&t1(z1)>=sy && t2(z2)>=sx && t1(z1)<sy+Bgi(4) && t2(z2)<sx+Bgi(3))
-					total_cost(i,(size(t2,2)*(z1-1))+z2)=C;
-				end
-			end
-		end
 
 		I_temp=zeros(size(Ig));
 		Iit=transform_im(Ii,scal(lsc(torder(k1+1))),rot(lro(torder(k1+1))),refl(lre(torder(k1+1))));
@@ -109,6 +99,26 @@ for(k1=0:num_transformation_count-1)
 			end
 		end
 		fprintf(smooth_file,'\n');
+
+		contributors=tcontributor_histogram{Tx,Ty};
+		for z1=1:size(contributors,1)
+			ti=contributors(z1,1);
+			tj=contributors(z1,2);
+			ti=((ti-(floor(patchsz/2)+1))/exstepsz(1))+1;
+			tj=((tj-(floor(patchsz/2)+1))/exstepsz(2))+1;
+			total_cost(i,(size(t2,2)*(ti-1))+tj)=0;
+		end
+
+
+
+		for z1=1:size(t1,2)
+			for z2=1:size(t2,2)
+				if(total_cost(i,(size(t2,2)*(z1-1))+z2)~=0 &&t1(z1)>=sy && t2(z2)>=sx && t1(z1)<sy+Bgi(4) && t2(z2)<sx+Bgi(3))
+					total_cost(i,(size(t2,2)*(z1-1))+z2)=C;
+				end
+			end
+		end
+
 	end
 
 	for i=1:size(total_cost,1)

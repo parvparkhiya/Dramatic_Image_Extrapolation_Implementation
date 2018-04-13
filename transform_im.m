@@ -5,4 +5,5 @@ function Igi = transform_im(Ig,scal,rot,refl)
 	end
 	Igi=imrotate(Igi,rot);
 	Igi=imresize(Igi,scal);
+	% imshow(Igi);
 end

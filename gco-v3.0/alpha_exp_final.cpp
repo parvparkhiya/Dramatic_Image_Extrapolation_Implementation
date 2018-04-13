@@ -117,6 +117,8 @@ int dataFn(int pixel, int label, void *data) {
 
 int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
 
+    // return 0;
+
     if (label1 == label2) {
         return 0;
     }
@@ -169,6 +171,8 @@ int dataFinalFn(int pixel, int label, void *data) {
 
 
 int smoothFinalFn(int pixel1, int pixel2, int label1, int label2, void *data) {
+
+    // return 0;
 
     if (label1 == label2) {
         return 0;
