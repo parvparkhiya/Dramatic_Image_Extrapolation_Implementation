@@ -34,9 +34,9 @@ for(k1=0:num_transformation_count-1)
 	% t1=floor(patchsz/2)+1:exstepsz(1):(size(Ig,1)-ceil(patchsz/2)+1);
 	% t2=floor(patchsz/2)+1:exstepsz(2):(size(Ig,2)-ceil(patchsz/2)+1);
 
-	
-	t1=floor(patchsz/2)+1:exstepsz(1):(size(Ig,1)-ceil(patchsz/2)+1);
-	t2=floor(patchsz/2)+1:exstepsz(2):(size(Ig,2)-ceil(patchsz/2)+1);
+
+	t1=1:size(Ig,1);
+	t2=1:size(Ig,2);
 
 	fprintf(uninary_file,'%d %d %d\n',size(t1,2),size(t2,2),best_t_count);
 	fprintf(smooth_file,'%d %d %d\n',size(t1,2),size(t2,2),best_t_count);
@@ -44,8 +44,10 @@ for(k1=0:num_transformation_count-1)
 	tcontributor_histogram=importdata(strcat('temp_result/contributor_histogram/',num2str(k1+1),'.mat'));
 
 	total_cost=ones(best_t_count,size(t1,2)*size(t2,2))*1000;
+
 	transformation_index=1;
 	for i=1:best_t_count
+	
 		Tx=floor(best_translation(i,torder(k1+1))/maxTxTy);
 		Ty=mod(best_translation(i,torder(k1+1)),maxTxTy);
 		% contributors=contributor_histogram{torder(k1+1)}{Tx,Ty};
@@ -100,24 +102,28 @@ for(k1=0:num_transformation_count-1)
 		end
 		fprintf(smooth_file,'\n');
 
+		mask=(rgb2gray(I_temp)==0);
+		total_cost_im=ones(size(Ig,1),size(Ig,2))*1000;
+		total_cost_im=total_cost_im.*mask;
+		total_cost_im=total_cost_im+((~mask)*C);
+
 		contributors=tcontributor_histogram{Tx,Ty};
+
 		for z1=1:size(contributors,1)
 			ti=contributors(z1,1);
 			tj=contributors(z1,2);
-			ti=((ti-(floor(patchsz/2)+1))/exstepsz(1))+1;
-			tj=((tj-(floor(patchsz/2)+1))/exstepsz(2))+1;
-			total_cost(i,(size(t2,2)*(ti-1))+tj)=0;
+			total_cost_im(ti,tj)=0;
 		end
 
+		total_cost(i,:)=reshape(total_cost_im',[1 size(Ig,1)*size(Ig,2)]);
 
-
-		for z1=1:size(t1,2)
-			for z2=1:size(t2,2)
-				if(total_cost(i,(size(t2,2)*(z1-1))+z2)~=0 &&t1(z1)>=sy && t2(z2)>=sx && t1(z1)<sy+Bgi(4) && t2(z2)<sx+Bgi(3))
-					total_cost(i,(size(t2,2)*(z1-1))+z2)=C;
-				end
-			end
-		end
+		% for z1=1:size(t1,2)
+		% 	for z2=1:size(t2,2)
+		% 		if(total_cost(i,(size(t2,2)*(z1-1))+z2)~=0 &&t1(z1)>=sy && t2(z2)>=sx && t1(z1)<sy+Bgi(4) && t2(z2)<sx+Bgi(3))
+		% 			total_cost(i,(size(t2,2)*(z1-1))+z2)=C;
+		% 		end
+		% 	end
+		% end
 
 	end
 

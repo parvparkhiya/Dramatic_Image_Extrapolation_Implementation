@@ -41,19 +41,23 @@ for i = 1:num_transformations
 	end
 end
 
-t1=floor(patch_size/2)+1:exstepsz(1):(height-ceil(patch_size/2)+1);
-t2=floor(patch_size/2)+1:exstepsz(2):(width-ceil(patch_size/2)+1);
+% t1=floor(patch_size/2)+1:exstepsz(1):(height-ceil(patch_size/2)+1);
+% t2=floor(patch_size/2)+1:exstepsz(2):(width-ceil(patch_size/2)+1);
 
+t1=1:size(Ig,1);
+t2=1:size(Ig,2);
 
 % Right now it considers that label stores only translation for now.
 for i = 1:size(t1, 2)
 	for j = 1:size(t2,2)
-		pixel = (i-1)*size(t2,2) + j;
-		py = t1(i) - floor(patch_size/2);
-		px = t2(j) - floor(patch_size/2);
-		outimage(py:py + patch_size - 1, px:px + patch_size - 1, :) = outimage(py:py + patch_size - 1, px:px + patch_size - 1, :) + im_tranforms(py:py + patch_size - 1, px:px + patch_size - 1, :, tflabels(pixel)+1, tllabels(pixel)+1);
-		counter(py:py + patch_size - 1, px:px + patch_size - 1) = counter(py:py + patch_size - 1, px:px + patch_size - 1) ...
-		+ ones([patch_size patch_size]);
+		if (i>=floor(patch_size/2)+1 && i<=(height-ceil(patch_size/2)+1) && j>=floor(patch_size/2)+1 && j<=(width-ceil(patch_size/2)+1) )
+			pixel = (i-1)*size(t2,2) + j;
+			py = t1(i) - floor(patch_size/2);
+			px = t2(j) - floor(patch_size/2);
+			outimage(py:py + patch_size - 1, px:px + patch_size - 1, :) = outimage(py:py + patch_size - 1, px:px + patch_size - 1, :) + im_tranforms(py:py + patch_size - 1, px:px + patch_size - 1, :, tflabels(pixel)+1, tllabels(pixel)+1);
+			counter(py:py + patch_size - 1, px:px + patch_size - 1) = counter(py:py + patch_size - 1, px:px + patch_size - 1) ...
+			+ ones([patch_size patch_size]);
+		end
 	end
 end
 mask = (counter == 0);

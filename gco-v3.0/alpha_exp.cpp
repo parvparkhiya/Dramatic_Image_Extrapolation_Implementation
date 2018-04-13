@@ -54,7 +54,7 @@ class Data {
             ifstream f(ufilename);
 	        ifstream g(sfilename);
 
-            f >> width_ >> height_ >> num_labels_;
+            f >> height_ >> width_ >> num_labels_;
 
             // assuming data is aligned in a single array row wise for each label.
             // i.e l1d11 l1d12 .. l1d21 l1d22 .. ... l2d11 l2d12 ..
@@ -70,8 +70,17 @@ class Data {
 	        int temp;
 	        g >> temp >> temp >> temp;
 
+            double tempr;
+
             for(int i = 0; i < num_labels_ * width_ * height_ * 3; i++) {
-                g >> smooth_data_[i];
+                g >> tempr; 
+                if (tempr<0)
+                    tempr=0;
+                else if (tempr>1)
+                    tempr=1;
+
+                smooth_data_[i]=(int)(tempr*255);
+                // smooth_data_[i]=(int)(tempr);
             }
         }
 
@@ -92,8 +101,7 @@ int dataFn(int pixel, int label, void *data) {
 
     int height = my_data->height;
     int width = my_data->width;
-    int x = pixel / width;
-    int y = pixel % width;
+
 
     // going to label and then going to the pixel in that label data.
     int dest = label * width * height + pixel;
@@ -128,8 +136,11 @@ int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
     float energy_diff_2_G = (float) (mdata[loc22 + imgW*imgH] - mdata[loc21 + imgW*imgH]);
     float energy_diff_2_B = (float) (mdata[loc22 + 2*imgW*imgH] - mdata[loc21 + 2*imgW*imgH]);
 
+    // cout << "Data loaded" << endl;
+
+
     return (int) (sqrt(energy_diff_1_R*energy_diff_1_R + energy_diff_1_G*energy_diff_1_G + energy_diff_1_B*energy_diff_1_B) + sqrt(
-        energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B));
+        energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B))+10;
 }
 
 int main(int argc, char **argv) {
@@ -139,6 +150,8 @@ int main(int argc, char **argv) {
     //int idx = atoi(argv[1]);
     string dir, fname, gname, output_file;
     for(int i = 0; i < 20; i++) {
+
+        cout << "translation " << i << endl;
         int idx = i;
         dir = "../../temp_result/";
 
@@ -157,9 +170,11 @@ int main(int argc, char **argv) {
         data_fn.data = data.get_unary_cost();
         data_fn.smooth_data = data.get_smooth_cost();
 
+
         gc->setDataCost(&dataFn, &data_fn);
         gc->setSmoothCost(&smoothFn, &data_fn);
-        gc-> expansion();
+
+        gc-> expansion(20);
 
         int result_size = data.get_width() * data.get_height();
         
@@ -168,6 +183,8 @@ int main(int argc, char **argv) {
         for (int i = 0; i < result_size; i++) {
             fout << gc->whatLabel(i) << " ";
         }
+
+        cout << "alpha expansion done for current translation" << endl;
     }
    
     return 0;
