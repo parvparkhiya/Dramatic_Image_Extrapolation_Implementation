@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
 
         gc->setDataCost(&dataFn, &data_fn);
         gc->setSmoothCost(&smoothFn, &data_fn);
-        gc-> expansion(50);
+        gc-> expansion();
 
         int result_size = data.get_width() * data.get_height();
         

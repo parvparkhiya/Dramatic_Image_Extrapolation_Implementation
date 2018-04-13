@@ -1,1 +1,1 @@
-/usr/bin/c++   -O3 -DNDEBUG   CMakeFiles/alpha_exp_final.dir/alpha_exp_final.cpp.o  -o alpha_exp_final -rdynamic libgco.a 
+/usr/bin/c++   -g   CMakeFiles/alpha_exp_final.dir/alpha_exp_final.cpp.o  -o alpha_exp_final -rdynamic libgco.a 

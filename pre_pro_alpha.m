@@ -5,6 +5,7 @@ clc;
 close all;
 load('temp_result/down_point_5_theatre.mat');
 
+
 [tsort,torder]=sort(num_patches,'descend');
 num_transformation_count=20;
 
@@ -25,6 +26,7 @@ for i1=1:size(scal,2)
 end
 
 for(k1=0:num_transformation_count-1)
+	k1
 	uninary_file=fopen(strcat('temp_result/uninary_cost_',num2str(k1),'.txt'),'w');
 	smooth_file=fopen(strcat('temp_result/raw_smoothness_cost_',num2str(k1),'.txt'),'w');
 
@@ -35,12 +37,13 @@ for(k1=0:num_transformation_count-1)
 	fprintf(uninary_file,'%d %d %d\n',size(t1,2),size(t2,2),best_t_count);
 	fprintf(smooth_file,'%d %d %d\n',size(t1,2),size(t2,2),best_t_count);
 
+	tcontributor_histogram=importdata(strcat('temp_result/contributor_histogram/',num2str(k1+1),'.mat'));
+
 	total_cost=ones(best_t_count,size(t1,2)*size(t2,2))*1000;
 	transformation_index=1;
 	for i=1:best_t_count
 		Tx=floor(best_translation(i,torder(k1+1))/maxTxTy);
 		Ty=mod(best_translation(i,torder(k1+1)),maxTxTy);
-		tcontributor_histogram=importdata(strcat('temp_result/contributor_histogram/',num2str(k1+1),'.mat'));
 		% contributors=contributor_histogram{torder(k1+1)}{Tx,Ty};
 		contributors=tcontributor_histogram{Tx,Ty};
 		for z1=1:size(contributors,1)

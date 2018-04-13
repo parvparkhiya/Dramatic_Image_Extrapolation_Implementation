@@ -6,7 +6,7 @@ clear;
 Ig=double(imread('SourceImage/theater1_guide.jpg'))/255;
 Ii=double(imread('SourceImage/theater1_input.jpg'))/255;
 
-resize_factor=0.5;
+resize_factor=0.25;
 
 Ig=imresize(Ig,resize_factor);
 Ii=imresize(Ii,resize_factor);
@@ -40,9 +40,9 @@ refl = [-1, 1];
 patchsz=32;
 exstepsz=[16 16];
 instepsz=[16 16];
-hogsize=324;
+hogsize=0;
 K=5;
-best_t_count=50;
+best_t_count=100;
 C=2; 
 
 xmax=0;

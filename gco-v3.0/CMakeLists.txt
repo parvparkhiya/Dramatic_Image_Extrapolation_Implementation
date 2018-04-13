@@ -19,7 +19,7 @@ set(lib_srcs
 
 set(example_srcs
     example.cpp)
-
+set(CMAKE_BUILD_TYPE Debug)
 set(alpha_exp_srcs alpha_exp.cpp)
 set(alpha_exp_final_srcs alpha_exp_final.cpp)
 

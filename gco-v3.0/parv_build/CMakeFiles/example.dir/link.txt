@@ -1,1 +1,1 @@
-/usr/bin/c++   -O3 -DNDEBUG   CMakeFiles/example.dir/example.cpp.o  -o example -rdynamic libgco.a 
+/usr/bin/c++   -g   CMakeFiles/example.dir/example.cpp.o  -o example -rdynamic libgco.a 
