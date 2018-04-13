@@ -5,6 +5,7 @@ clc;
 close all;
 load('temp_result/down_point_5_theatre.mat');
 
+
 [tsort,torder]=sort(num_patches,'descend');
 num_transformation_count=20;
 
