@@ -46,7 +46,7 @@ patchsz=32;
 exstepsz=[16 16];
 instepsz=[16 16];
 
-hogsize=0;
+hogsize=324;
 % hogsize=32; %324
 K=5;
 best_t_count=50;

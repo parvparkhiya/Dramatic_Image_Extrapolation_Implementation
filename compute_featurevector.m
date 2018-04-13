@@ -35,4 +35,5 @@ function feature = compute_featurevector(I, idx, idy, patch_size)
 	% feature = zeros([1 patch_size*patch_size*3]);
 	feature = reshape(Is, [1, size(Is,1)*size(Is,2)*size(Is,3)]);
 	% feature = [feature, extractHOGFeatures(Is,'BlockSize',block_sz,'CellSize',cell_sz,'NumBins',num_bin)];
+	feature = [feature, extractHOGFeatures(Is)];
 end

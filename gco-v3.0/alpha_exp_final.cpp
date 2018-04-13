@@ -284,7 +284,18 @@ int main() {
 
     gc->setDataCost(&dataFinalFn, data_fn);
     gc->setSmoothCost(&smoothFinalFn, data_fn);
-    gc-> expansion(20);
+
+    // for (int x1=0;x1<data[0].get_width();x1++)
+    // {
+    //     for (int x2=0;x2<data[0].get_height();x2++)
+    //     {
+
+    //         if (x1>=40 && x1<=(30+186) && x2>=17 && x2<=(6+114))
+    //             gc->setLabel(x2*(data[0].get_width())+x1,20);
+
+    //     }
+    // }
+    gc-> expansion(30);
 
     // cout << "testing" <<endl;
 

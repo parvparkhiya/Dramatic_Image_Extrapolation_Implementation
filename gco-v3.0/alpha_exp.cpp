@@ -149,7 +149,7 @@ int main(int argc, char **argv) {
     // }
     //int idx = atoi(argv[1]);
     string dir, fname, gname, output_file;
-    for(int i = 0; i < 20; i++) {
+    for(int i = 0; i < 21; i++) {
 
         cout << "translation " << i << endl;
         int idx = i;
@@ -174,7 +174,7 @@ int main(int argc, char **argv) {
         gc->setDataCost(&dataFn, &data_fn);
         gc->setSmoothCost(&smoothFn, &data_fn);
 
-        gc-> expansion(20);
+        gc-> expansion(50);
 
         int result_size = data.get_width() * data.get_height();
         

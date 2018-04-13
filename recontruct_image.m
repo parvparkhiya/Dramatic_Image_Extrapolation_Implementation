@@ -12,7 +12,7 @@ load('temp_result/down_point_5_theatre.mat');
 width=size(Ig,2);
 height=size(Ig,1);
 
-num_transformations = 20;
+num_transformations = 21;
 num_translations = best_t_count;
 patch_size = patchsz;
 % exstepsz=[16 16];
@@ -54,7 +54,8 @@ for i = 1:size(t1, 2)
 			pixel = (i-1)*size(t2,2) + j;
 			py = t1(i) - floor(patch_size/2);
 			px = t2(j) - floor(patch_size/2);
-			outimage(py:py + patch_size - 1, px:px + patch_size - 1, :) = outimage(py:py + patch_size - 1, px:px + patch_size - 1, :) + im_tranforms(py:py + patch_size - 1, px:px + patch_size - 1, :, tflabels(pixel)+1, tllabels(pixel)+1);
+		    outimage(py:py + patch_size - 1, px:px + patch_size - 1, :) = outimage(py:py + patch_size - 1, px:px + patch_size - 1, :) + im_tranforms(py:py + patch_size - 1, px:px + patch_size - 1, :, tflabels(pixel)+1, tllabels(pixel)+1);
+			%outimage(py:py + patch_size - 1, px:px + patch_size - 1, :) = outimage(py:py + patch_size - 1, px:px + patch_size - 1, :) + im_tranforms(py:py + patch_size - 1, px:px + patch_size - 1, :, 10, tllabels(pixel)+1);
 			counter(py:py + patch_size - 1, px:px + patch_size - 1) = counter(py:py + patch_size - 1, px:px + patch_size - 1) ...
 			+ ones([patch_size patch_size]);
 		end
@@ -67,5 +68,5 @@ outimage(:,:,2) = outimage(:,:,2) ./ counter;
 outimage(:,:,3) = outimage(:,:,3) ./ counter;
 
 
-outimage(Bgi(2):Bgi(2)+Bgi(4)-1,Bgi(1):Bgi(1)+Bgi(3)-1,:)=Ii;
+% outimage(Bgi(2):Bgi(2)+Bgi(4)-1,Bgi(1):Bgi(1)+Bgi(3)-1,:)=Ii;
 imshow(outimage);
