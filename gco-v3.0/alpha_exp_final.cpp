@@ -61,7 +61,7 @@ class Data {
             ifstream f(ufilename);
             ifstream g(sfilename);
             ifstream h(smapfilename);
-            f >> width_ >> height_ >> num_labels_;
+            f >>  height_ >> width_ >> num_labels_;
             // assuming data is aligned in a single array row wise for each label.
             // i.e l1d11 l1d12 .. l1d21 l1d22 .. ... l2d11 l2d12 ..
             data_ = new int[num_labels_ * width_ * height_];
@@ -73,9 +73,18 @@ class Data {
             smooth_data_ = new int[num_labels_ * width_ * height_ * 3];
             shift_map_ = new int[num_labels_*width_*height_];
            int temp;
+           double tempr;
+
             g >> temp >> temp >> temp;
             for(int i = 0; i < num_labels_ * width_ * height_ * 3; i++) {
-                g >> smooth_data_[i];
+                g >> tempr;
+                
+                if (tempr<0)
+                    tempr=0;
+                else if (tempr>1)
+                    tempr=1;
+
+                smooth_data_[i]=(int)(tempr*255);
             }
           for(int i=0;i<width_*height_;i++)
           {
@@ -117,6 +126,8 @@ int dataFn(int pixel, int label, void *data) {
 
 int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
 
+    // return 0;
+
     if (label1 == label2) {
         return 0;
     }
@@ -141,8 +152,14 @@ int smoothFn(int pixel1, int pixel2, int label1, int label2, void *data) {
     float energy_diff_2_G = (float) (mdata[loc22 + imgW*imgH] - mdata[loc21 + imgW*imgH]);
     float energy_diff_2_B = (float) (mdata[loc22 + 2*imgW*imgH] - mdata[loc21 + 2*imgW*imgH]);
 
-    return (int) (sqrt(energy_diff_1_R*energy_diff_1_R + energy_diff_1_G*energy_diff_1_G + energy_diff_1_B*energy_diff_1_B) + sqrt(
+    int final;
+    final=(int)(sqrt(energy_diff_1_R*energy_diff_1_R + energy_diff_1_G*energy_diff_1_G + energy_diff_1_B*energy_diff_1_B) + sqrt(
         energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B))+10;
+
+    // cout << final << endl;
+
+
+    return final;
 }
 
 int dataFinalFn(int pixel, int label, void *data) {
@@ -152,16 +169,22 @@ int dataFinalFn(int pixel, int label, void *data) {
     int x = pixel / width;
     int y = pixel % width;
     // for pixel (x,y) neighbors are (x-1, y), (x+1, y), (x, y-1), (x, y+1)
-    int neighbors[4] = { width*(x-1) + y, width*(x+1) + y, width*x + y - 1, width*x + y + 1};
+    int neighbors_x[4] = { (x-1), (x+1), x, x};
+    int neighbors_y[4] = { y, y,y - 1,y + 1};
 
     int un_cost = dataFn(pixel, my_data->shift_map[pixel], (void *) my_data);
     int sm_cost = 0;
+    int px, py;
     for(int i = 0; i < 4; i++) {
-        if(neighbors[i] < 0 or neighbors[i] >= height*width) {
+        px = neighbors_x[i];
+        py = neighbors_y[i];
+        if(px < 0 or px > height or py < 0 or py > width) {
             continue;
         }
+        int npixel = px*width + py;
+
         sm_cost += smoothFn(
-            pixel, neighbors[i], my_data->shift_map[pixel], my_data->shift_map[neighbors[i]], (void *)my_data);
+            pixel, npixel, my_data->shift_map[pixel], my_data->shift_map[npixel], (void *)my_data);
 
     }
     return un_cost + sm_cost;
@@ -169,6 +192,10 @@ int dataFinalFn(int pixel, int label, void *data) {
 
 
 int smoothFinalFn(int pixel1, int pixel2, int label1, int label2, void *data) {
+
+    // return 0;
+
+
 
     if (label1 == label2) {
         return 0;
@@ -189,14 +216,16 @@ int smoothFinalFn(int pixel1, int pixel2, int label1, int label2, void *data) {
     int *shiftmap_label1 = data_label1->shift_map;
     int *shiftmap_label2 = data_label2->shift_map;
 
-    int translation_label1=shiftmap_label1[pixel1];
-    int translation_label2=shiftmap_label2[pixel2];
+    int translation_label11=shiftmap_label1[pixel1];
+    int translation_label12=shiftmap_label1[pixel2];
+    int translation_label21=shiftmap_label2[pixel1];
+    int translation_label22=shiftmap_label2[pixel2];
 
     // locij implies location of pixel i in image with label j;
-    int loc11 = translation_label1*imgW*imgH*3 + pixel1;
-    int loc12 = translation_label2*imgW*imgH*3 + pixel1;
-    int loc21 = translation_label1*imgW*imgH*3 + pixel2;
-    int loc22 = translation_label2*imgW*imgH*3 + pixel2;
+    int loc11 = translation_label11*imgW*imgH*3 + pixel1;
+    int loc12 = translation_label21*imgW*imgH*3 + pixel1;
+    int loc21 = translation_label12*imgW*imgH*3 + pixel2;
+    int loc22 = translation_label22*imgW*imgH*3 + pixel2;
 
     int *mdata_label1=data_label1->smooth_data;
     int *mdata_label2=data_label2->smooth_data;
@@ -209,8 +238,13 @@ int smoothFinalFn(int pixel1, int pixel2, int label1, int label2, void *data) {
     float energy_diff_2_G = (float) (mdata_label2[loc22 + imgW*imgH] - mdata_label1[loc21 + imgW*imgH]);
     float energy_diff_2_B = (float) (mdata_label2[loc22 + 2*imgW*imgH] - mdata_label1[loc21 + 2*imgW*imgH]);
 
-    return (int) (sqrt(energy_diff_1_R*energy_diff_1_R + energy_diff_1_G*energy_diff_1_G + energy_diff_1_B*energy_diff_1_B) + sqrt(
+    int final;
+    final=(int)(sqrt(energy_diff_1_R*energy_diff_1_R + energy_diff_1_G*energy_diff_1_G + energy_diff_1_B*energy_diff_1_B) + sqrt(
         energy_diff_2_R*energy_diff_2_R + energy_diff_2_G*energy_diff_2_G + energy_diff_2_B*energy_diff_2_B))+10;
+
+    // cout << final << endl;
+
+    return final;
 }
 int main() {
 
@@ -243,12 +277,25 @@ int main() {
       data_fn[j].data = data[j].get_unary_cost();
       data_fn[j].smooth_data = data[j].get_smooth_cost();
       data_fn[j].shift_map = data[j].get_shift_map();
+
+      cout << "Data loaded for transformation: " << j <<endl;
   }
     GCoptimizationGridGraph *gc = new GCoptimizationGridGraph(data[0].get_width(), data[0].get_height(),num_transformation_label);
 
     gc->setDataCost(&dataFinalFn, data_fn);
     gc->setSmoothCost(&smoothFinalFn, data_fn);
-    gc-> expansion(0);
+
+    // for (int x1=0;x1<data[0].get_width();x1++)
+    // {
+    //     for (int x2=0;x2<data[0].get_height();x2++)
+    //     {
+
+    //         if (x1>=40 && x1<=(30+186) && x2>=17 && x2<=(6+114))
+    //             gc->setLabel(x2*(data[0].get_width())+x1,20);
+
+    //     }
+    // }
+    gc-> expansion(30);
 
     // cout << "testing" <<endl;
 
@@ -267,5 +314,6 @@ int main() {
     
     }
 
+    cout << "alpha expansion completed" << endl;
     return 0;
 }

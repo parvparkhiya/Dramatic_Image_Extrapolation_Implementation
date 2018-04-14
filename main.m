@@ -22,7 +22,7 @@ Ii=imresize(Ii,resize_factor);
 
 % Bgi = ceil([265,392,1075,714]*resize_factor); % for gate
 % old  Bgi = ceil([285,91,604,396]*resize_factor);  % for theater
-Bgi = ceil([141,45,745,458]*resize_factor);  % for theater
+Bgi = floor([141,45,745,458]*resize_factor);  % for theater
 Ii = imresize(Ii,[Bgi(4) Bgi(3)]);
 
 % create Igi image from above
@@ -37,12 +37,19 @@ scal = linspace(0.5, 2.0, 11);
 rot = linspace(-45, 45, 11);
 refl = [-1, 1];
 
+
+% patchsz=8;
+% exstepsz=[4 4];
+% instepsz=[2 2];
+
 patchsz=32;
 exstepsz=[16 16];
 instepsz=[16 16];
-hogsize=0;
+
+hogsize=324;
+% hogsize=32; %324
 K=5;
-best_t_count=100;
+best_t_count=50;
 C=2; 
 
 xmax=0;
@@ -59,8 +66,8 @@ for i=1:size(rot,2)
 end
 
 % maxTxTy=(2*ceil(sqrt((size(Ig,1)^2)+(size(Ig,2)^2))))+1;
-maxTxTy=(2*max([Bgi(2)+(ymax) , Bgi(1)+xmax , size(Ig,1) , size(Ig,2) ]))+1;
-thresh=100;  %while picking top 5 neartest neighbour
+maxTxTy=(2*max([Bgi(2)+(ymax) , Bgi(1)+xmax , size(Ig,1)-Bgi(2) , size(Ig,2)-Bgi(1) ]))+1;
+thresh=50;  %while picking top 5 neartest neighbour
 
 % initialize datastructure to store the best value for each branch
 % best_maps = []
@@ -70,7 +77,7 @@ b_idx = 0;
 
 best_translation=zeros(best_t_count,size(scal,2)*size(rot,2)*size(refl,2));
 num_patches=zeros(size(scal,2)*size(rot,2)*size(refl,2),1);
-contributor_histogram=cell(size(scal,2)*size(rot,2)*size(refl,2),1);
+% contributor_histogram=cell(size(scal,2)*size(rot,2)*size(refl,2),1);
 
 %%
 % process each branch
@@ -81,8 +88,8 @@ for s=1:size(scal,2)
 			b_idx =b_idx+1;
 			% do something
 			% best_maps[b_idx] = process_branch(Ig, Igi, Ii, scal(s), rot(r), refl(re));
-            [best_translation(:,b_idx),num_patches(b_idx),contributor_histogram{b_idx}]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re),patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);
-            thist=contributor_histogram{b_idx};
+            [best_translation(:,b_idx),num_patches(b_idx),thist]=process_branch(Ig, Igi,Bgi, scal(s), rot(r), refl(re),patchsz,exstepsz,instepsz,hogsize,K,thresh,maxTxTy,best_t_count);
+            % thist=contributor_histogram{b_idx};
             save(strcat('temp_result/contributor_histogram/',num2str(b_idx),'.mat'),'thist');
 
             % remember to change below

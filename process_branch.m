@@ -72,13 +72,23 @@ function [best_translation,num_patches,contributor_histogram]=process_branch(Ig,
           if(size(delta_feature_vector,1)~=0)
             delta_feature_vector=sortrows(delta_feature_vector,1);
             K1=min(K,size(delta_feature_vector,1));
-            delta_feature_vector=delta_feature_vector((end-K1+1):end,:);
+            % delta_feature_vector=delta_feature_vector((end-K1+1):end,:);
+            delta_feature_vector=delta_feature_vector(1:K1,:);
+
+
 
             for kk=1:K1
+
+              % imshowpair(Ig((i-floor(patchsz/2)):(i-floor(patchsz/2)+patchsz-1),(j-floor(patchsz/2)):(j-floor(patchsz/2)+patchsz-1),:),Igii((delta_feature_vector(kk,2)-floor(patchsz/2)):(delta_feature_vector(kk,2)-floor(patchsz/2)+patchsz-1),(delta_feature_vector(kk,3)-floor(patchsz/2)):(delta_feature_vector(kk,3)-floor(patchsz/2)+patchsz-1),:),'montage');
+              % waitforbuttonpress;
+
               Ty=Bgi(2)+delta_feature_vector(kk,2)-1-i+floor(maxTxTy/2)+1;
               Tx=Bgi(1)+delta_feature_vector(kk,3)-1-j+floor(maxTxTy/2)+1;
-              if (((maxTxTy*Tx)+Ty)>maxTxTy*maxTxTy)
-                'nothing;'
+              % sx=Bgi(1)-(Tx-(floor(maxTxTy/2)+1));
+              % sy=Bgi(2)-(Ty-(floor(maxTxTy/2)+1));
+              if (Tx<=0 || Tx >= maxTxTy || Ty <=0 || Ty >= maxTxTy)
+                'something is wrong';
+                 exit;
               end
               Histogram((maxTxTy*Tx)+Ty)=Histogram((maxTxTy*Tx)+Ty)+1;
               contributor_histogram{Tx,Ty}=[contributor_histogram{Tx,Ty};i,j];
