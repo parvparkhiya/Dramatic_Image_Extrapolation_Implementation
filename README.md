@@ -6,10 +6,19 @@
 - Parv Parkhiya
 - Yogesh Sharma
 
-### Contributing
+## To run the algo
 
-- Don't push the code directly to master.
-- To make a change, fetch latest version of branch `git checkout master; git fetch origin; git merge origin/master`, create a branch from master `git checkout -b branchname`
-- Make appropriate changes in the branch.
-- Push the branch when changes done `git push origin branchname`
-- Create a pull request from the web interface.
+- Run main.m which will pick top translation for discretize transformation
+
+- Run pre_pro_alpha.m to generate input files of uninary cost and smootheness cost for alpha expansion
+
+- Run ./gco-v3.0/parv_build/alpha_exp to run 20 independent alpha exanpsion to generate respective shift map
+
+- Run ./gco-v3.0/parv_build/alpha_exp_final to run final alpha expansion to generate transformation map 
+
+- Run recontruct.m file to finally generate reconstructed image
+
+
+## github repo link
+
+- https://github.com/parvparkhiya/Dramatic_Image_Extrapolation_Implementation/
